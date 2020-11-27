@@ -139,11 +139,6 @@ class Fp_Growth(General_Tree):
         Root = General_Tree("Root")
         return Root
 
-
-    def __Concat(self,M, N):
-        M.New_Item(N)
-        return M
-
     def __mainroot(self,M):
         Tree_list = []
         if len(M) >= 2:
