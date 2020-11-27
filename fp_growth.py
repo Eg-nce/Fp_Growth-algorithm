@@ -210,8 +210,7 @@ class Fp_Growth(General_Tree):
                     x = x + 1
             except IndexError:
                 Main = Main_Back
-                break
-      
+                break      
 
       
         l = 0
@@ -353,13 +352,8 @@ class Fp_Growth(General_Tree):
           Clean_list.append(temp_big)
 
       
-
-      
       return tuple(Clean_list)
       
-
-
-
     def Pickaxe(self):
         M_list =  self.__minsups()
         if len(M_list) == 1:
@@ -385,8 +379,6 @@ class Fp_Growth(General_Tree):
                         confidence_temp.append( M_list[Con_list.index(v)][0])
                         confidence_temp.append( "confidence =  % {}".format(confidence_var))
                         Confidence.append( confidence_temp)
-
-
 
             queue = queue + 1      
             if queue == len(Con_list):
