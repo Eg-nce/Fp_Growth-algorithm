@@ -2,7 +2,6 @@ from itertools import combinations
 import math
 import pandas as pd
 
-
 class General_Tree:
     def __init__(self, data):
         self.data = data
@@ -40,9 +39,17 @@ class Fp_Growth(General_Tree):
     def __init__(self , Data , Minsup, Confidence):
   
         self.Data = Data
+        self.Minsup = Minsup
+        
+        if self.Minsup > 100 or self.Minsup <  0 :
+           raise TypeError ( "minsup rate must be between 0 - 100 ")
         self.Minsup = int(math.ceil((Minsup*len(self.Data.values.tolist()))/100))
         self.CleanData = None
         self.Label = None
+        self.Confidence = Confidence
+        
+        if self.Confidence  > 100 or self.Confidence <  0 :
+             raise TypeError ( "confidence   must be between 0 - 100 ")
         self.Confidence = Confidence
 
     def __MinsupKiller(self, Data ,Minsup):
@@ -58,7 +65,7 @@ class Fp_Growth(General_Tree):
         Data =  Data.values.tolist()
         i = 0 
         while True:
-            try:
+            try:    
                 Data[i].remove("NaNxx")
             except :   
                 ValueError
@@ -73,7 +80,7 @@ class Fp_Growth(General_Tree):
                 else:
                     s1[j] = 1
         for x, y in s1.items():
-            if y > self.Minsup:
+            if y >= self.Minsup:
                 s2[x] = y
             else:
                 for elements in Data:
@@ -82,8 +89,11 @@ class Fp_Growth(General_Tree):
 
         Data = sorted(Data, key=lambda x: len(x), reverse=True)
         Data = list(filter(None, Data))
-        new = {k: v for k, v in sorted(s2.items(), reverse=True, key=lambda item: item[1])}
-        self.Label = new
+        Label = {k: v for k, v in sorted(s2.items(), reverse=True, key=lambda item: item[1])}
+        if len(Label) == 0:
+              raise TypeError("minimum support candidate and confidences does not exist !!!\n try decrease minsup or confidence rate")
+      
+        self.Label = Label
         return  Data
 
     def __Sorter(self):
@@ -167,47 +177,50 @@ class Fp_Growth(General_Tree):
         x = 0;  y = 0; c = 0
 
         while True:
+            
             index_list = []
+            try:
+                for elem in Main.Get_childrens():
 
-            for elem in Main.Get_childrens():
-
-                if (List[x][y][c] in elem) == True:
-                    index_list.append("Y")
+                    if (List[x][y][c] in elem) == True:
+                        index_list.append("Y")
 
 
-                else:
-                    index_list.append("N")
+                    else:
+                        index_list.append("N")
 
-            if "Y" not in index_list:
-                Leaf = self.__mainroot(List[x][y][List[x][y].index(List[x][y][c]):])
-                Main.New_Item(Leaf)
-                c = 0
-                y = y + 1
-                Main = Main_Back
-            else:
-                index = index_list.index("Y")
-                Main = Main.GetChild(index)
-                Main.AddPlus()
-                c = c + 1
-                if c == len(List[x][y]):
-                    y = y + 1
+                if "Y" not in index_list:
+                    Leaf = self.__mainroot(List[x][y][List[x][y].index(List[x][y][c]):])
+                    Main.New_Item(Leaf)
                     c = 0
+                    y = y + 1
                     Main = Main_Back
-            if y == len(List[x]):
-                y = 0
-                c = 0
-                x = x + 1
-
-            if x == len(List):
+                else:
+                    index = index_list.index("Y")
+                    Main = Main.GetChild(index)
+                    Main.AddPlus()
+                    c = c + 1
+                    if c == len(List[x][y]):
+                        y = y + 1
+                        c = 0
+                        Main = Main_Back
+                if y == len(List[x]):
+                    y = 0
+                    c = 0
+                    x = x + 1
+            except IndexError:
                 Main = Main_Back
                 break
+      
 
-        c = 0;   l = 0
-        counted_list = self.__empty(10000)
+      
+        l = 0
+        counted_list = [] 
         while True:
             try:
 
                 Main = Main.GetChild(0)
+                counted_list.append([])
                 counted_list[l].append(Main.GetVal())
             except IndexError:
 
@@ -239,15 +252,26 @@ class Fp_Growth(General_Tree):
                     break
         counted_list = list(filter(None, counted_list))
         return counted_list
-
+    
+    
     def __Ready_list(self):
+        def co(elem):
+            var = elem.count("+")
+            yield var
+        
+        def key2(List):
+            var = List.replace("+" , "")
+            yield var
+        
         counted = self.__Create_and_Count()
         final_list = []; j = 0; i = 0 ;  z = {}
         
         while True:
-            var = counted[j][i].count('+')
+            #var = counted[j][i].count('+')
+            var = next(co(counted[j][i]))
             key = counted[j][i]
-            key = key.replace("+", "")
+            key  = next(key2(key))
+            #key = key.replace("+", "")
 
             z[key] = var + 1
             i = i + 1
@@ -265,12 +289,14 @@ class Fp_Growth(General_Tree):
     
     def __minsups(self):
       final_list = self.__Ready_list()
-      Fp_list = [];    Seen_list = [] ;    Clean_list = []
-      
-  
+      Fp_list = [];    Clean_list = [] ; sizeof = 0
+ 
       Labels = [x for x in  self.Label.keys()] 
+      if len(Labels) == 1:
+            self.Label[Labels[0]] =("% {} ").format( (self.Label[Labels[0]]*100)/len(self.Data))
+            return self.Label 
       while True:
-         index_list = [] ; val_list = []
+         index_list = [] ; val_list = [] ;    Seen_list = [] 
          val= 0
          final_list =   [i for n, i in enumerate( final_list) if i not in  final_list[n + 1:]]
   
@@ -297,33 +323,48 @@ class Fp_Growth(General_Tree):
                         Fp_list.append(temp)
                     else:
                         var = Seen_list.index(j)
+                        var = var + sizeof
                         Fp_list[var][2] = Fp_list[var][2] + val_list[val]
       
             val = val + 1 
          Labels.pop(-1)
+         sizeof = sizeof + len(Seen_list)
          if len(Labels) == 1:
          
            Seen_list = None
            break
       
-      for lab , val  in self.Label.items():
-          temp = []
-          temp.append(list(lab.split(" ")))
-          temp.append("======>")
-          temp.append(val)
-          Clean_list.append(temp)
-
       
       for gtx  in  Fp_list:
         if gtx[2] >= self.Minsup:
          
              Clean_list.append(gtx)
       
+      for lab , val  in self.Label.items():
+          temp_inside = []
+          temp_big = []
+          lab = lab.split(" ")
+          lab = " ".join(lab)
+          temp_inside.append(lab)
+          temp_big.append(temp_inside)
+          temp_big.append("======>")
+          temp_big.append(val)
+
+          Clean_list.append(temp_big)
+
+      
+
+      
       return tuple(Clean_list)
       
-      
+
+
+
     def Pickaxe(self):
         M_list =  self.__minsups()
+        if len(M_list) == 1:
+           
+           return self.Label , []
         Con_list = []
         Confidence = list()
         queue = 0 
@@ -335,7 +376,7 @@ class Fp_Growth(General_Tree):
             var = Con_list[queue]
     
             for v in Con_list:
-                if var.issubset(v) and v  !=  var:
+                if (var.issubset(v)) == True and v  !=  var:
                     confidence_temp  = []
                     confidence_var = 100*(M_list[Con_list.index(v)][2] /  M_list[queue][2])
                     if confidence_var >= self.Confidence:
@@ -356,18 +397,4 @@ class Fp_Growth(General_Tree):
 
         return Pickaxe ,Confidence 
 
-
-
-        
-
-
   
-
-f = Fp_Growth(data , 10,40)
-a , b = f.Pickaxe()
-print("*********")
-print(a)
-print("*********")
-print(b)
-
-
