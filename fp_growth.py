@@ -109,9 +109,7 @@ class Fp_Growth(General_Tree):
                     Sort_list.append(labels)
 
             self.CleanData[z] = Sort_list
-
             Sort_list = []
-
             z = z + 1
             if z == len(self.CleanData):
                 break
@@ -261,12 +259,9 @@ class Fp_Growth(General_Tree):
         final_list = []; j = 0; i = 0 ;  z = {}
         
         while True:
-            #var = counted[j][i].count('+')
             var = next(co(counted[j][i]))
             key = counted[j][i]
             key  = next(key2(key))
-            #key = key.replace("+", "")
-
             z[key] = var + 1
             i = i + 1
 
