@@ -66,7 +66,7 @@ class Fp_Growth(General_Tree):
         row = 0 
         while True:
             try:    
-                Data[row].remove("NaNxx")
+                Data[row].remove("NaNxxxxass")
             except :   
                 ValueError
                 row = row + 1 
