@@ -171,7 +171,7 @@ class Fp_Growth(General_Tree):
         Main_Back = Main
         List =  list(filter(None, List) )
 
-        root = 0;  leaf = 0; elem = 0
+        root = 0;  leaf = 0; item = 0
 
         while True:
             
