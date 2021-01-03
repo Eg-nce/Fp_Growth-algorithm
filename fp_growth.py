@@ -42,14 +42,14 @@ class Fp_Growth(General_Tree):
         self.Minsup = Minsup
         
         if self.Minsup > 100 or self.Minsup <  0 :
-           raise TypeError ( "minsup rate must be between 0 - 100 ")
+           raise TypeError ( "minsup rate is must be between 0 - 100 ")
         self.Minsup = int(math.ceil((Minsup*len(self.Data.values.tolist()))/100))
         self.CleanData = None
         self.Label = None
         self.Confidence = Confidence
         
         if self.Confidence  > 100 or self.Confidence <  0 :
-             raise TypeError ( "confidence   must be between 0 - 100 ")
+             raise TypeError ( "confidence is  must be between 0 - 100 ")
         self.Confidence = Confidence
 
     def __MinsupKiller(self, Data ,Minsup):
