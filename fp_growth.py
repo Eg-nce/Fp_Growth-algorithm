@@ -61,7 +61,7 @@ class Fp_Growth(General_Tree):
            Data =  Data.applymap(str.lower)
         except:
             TypeError
-        Data =  Data.fillna('NaNxx')
+        Data =  Data.fillna('NaNxxxxass')
         Data =  Data.values.tolist()
         row = 0 
         while True:
